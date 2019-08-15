@@ -7,7 +7,22 @@ import matplotlib.pyplot as plt
 from IPython.display import Markdown
 import os
 
-def getseqsample(file, output_name, max_length):
+# read fasta sequence from file
+def getseqsample(file):
+    pure_chunk = ''
+    No_of_fastas = 0
+    with open (file) as seq:
+        for line in seq:
+            if not line.startswith('>'):
+                upperLine = line.upper().strip()
+                pure_upper_line = ''.join([ s for s in upperLine if s in 'ATGC'])
+                pure_chunk += pure_upper_line
+        return pure_chunk                                      
+            
+
+
+# extract oligomer of certain length from fasta file
+def getseqsamples(file, output_name, max_length):
     pure_chunk = ''
     No_of_fastas = 0
     with open (file) as seq, open(f'{output_name}.txt', 'w') as output:
@@ -29,7 +44,7 @@ def getseqsample(file, output_name, max_length):
         display (Markdown(f'<span style="color: #ff0000">Error: Max length of unambiguous code too short:</span>{len(pure_chunk)}.'))
 
 
-# test sample: getseqsample("C:\\Users\\chapmanvl\\Documents\\VC 2019 projects\\HRV_input\\HRV_A.fasta", "test1", 5000)
+# test sample: getseqsamples("C:\\Users\\chapmanvl\\Documents\\VC 2019 projects\\HRV_input\\HRV_A.fasta", "test1", 5000)
 
 
 # cut sequence into user-defined number of lengths of fixed length - needs clean sequence sto be input (have to run sequences through getseqsample first)
@@ -37,7 +52,7 @@ def cutandsample_fixed(file, output_folder_name, desired_length, number):
     # making a new directory, opening the file,determining sequence length and checking that sequence length is longer than desired length
     os.mkdir(f"{output_folder_name}")
     with open(file) as sequence:
-        seq = ''.join([bases for bases in sequence if bases in 'ATGC']) 
+        seq = ''.join([bases for bases in sequence]) 
         seq_length = len(seq)
         end_of_seq = seq_length - desired_length
         if seq_length < desired_length:
@@ -59,7 +74,7 @@ def cutandsample_random(file, output_folder_name, number):
     # making a new directory, opening the file,determining sequence length and checking that sequence length is longer than desired length
     os.mkdir(f"{output_folder_name}")
     with open(file) as sequence:
-        seq = ''.join([bases for bases in sequence if bases in 'ATGC']) 
+        seq = ''.join([bases for bases in sequence]) 
         seq_length = len(seq)      
         lengths = []
     #slicing up sequences to desired length
@@ -85,7 +100,7 @@ def one_cold_chaos_coord(oligomer):
     for i in range(len(X_complex[1:])):
         h = i + 1
         X_complex[h] = (X_complex[i] + X_complex[h])/2
-    for i in range(len(one_cold_worm_Y[1:])):
+    for i in range(len(Y_complex[1:])):
         h = i + 1
         Y_complex[h] = (Y_complex[i] + Y_complex[h])/2
         
@@ -120,3 +135,46 @@ def seq_to_chaos(seq):
     plt.show()
     
 # test case: seq_to_chaos('GAATTC')
+
+# For exporting to a file
+def seq_to_chaosfile(seq, name):
+    # clean seq first
+    sequence = seq.strip().upper()        
+    # warn the user if an obnoxoious character found in the file
+    for uniq_char in  set(sequence):
+        if uniq_char not in 'ATCGN':  
+            print( f"a bad character found: {uniq_char}")
+    pure_sequence = ''.join([ s for s in sequence if s in 'ATGC'])  
+    chaos = one_cold_chaos_coord(pure_sequence)
+    X = chaos[0]
+    Y = chaos[1]
+
+    plt.plot(X, Y, 'k.', markersize=1)
+    plt.axis('off')
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+    plt.savefig(f'{name}.png', bboxinches = 0, set_facecolor = 'white')
+
+# Test case:    seq_to_chaosfile('ATTTGCATGAGGGGAGAT', 'testing')
+
+
+# For exporting to file and also giving Z (list of X and Y)
+def seq_to_chaosfile(seq, name):
+    # clean seq first
+    sequence = seq.strip().upper()        
+    # warn the user if an obnoxoious character found in the file
+    for uniq_char in  set(sequence):
+        if uniq_char not in 'ATCGN':  
+            print( f"a bad character found: {uniq_char}")
+    pure_sequence = ''.join([ s for s in sequence if s in 'ATGC'])  
+    chaos = one_cold_chaos_coord(pure_sequence)
+    X = chaos[0]
+    Y = chaos[1]
+
+    plt.plot(X, Y, 'k.', markersize=1)
+    plt.axis('off')
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+    new_name = os.path.splitext(name)[0] # to remove current file extension
+    plt.savefig(f'{new_name}.png', bboxinches = 0, set_facecolor = 'white')
+    return X, Y 
