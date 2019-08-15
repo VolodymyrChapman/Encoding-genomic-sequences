@@ -44,19 +44,23 @@ def one_cold_chaos_coord(oligomer):
     # retrieve the power signal from the Z coordinates
 
 def powersignal(cgr_z):
-    #array = np.array(input[0])
     dftZ = np.fft.fft(cgr_z)
     PSZ = np.abs(dftZ)**2
     mean_signal = PSZ[0]
     signal = PSZ[1:] #skipping first signal 
-    #freq = np.fft.fftfreq((psd.shape[0]) )
     return mean_signal, signal
 
-def even_scale(power_signal, output_scale):
+# even scale power signal of one length to another length - method based on Yin and Yau, 2015 (J. Theoretical Biology)
+def even_scale(signal, output_scale):
+    scaled_signal = [signal[0]] # first term for tm and tn the same
+    initialise = range(2,output_scale + 1)
+    Q = [k*(len(signal)/output_scale) for k in initialise] 
+    R = [math.floor(k) for k in Q]
+    for k in range(len(Q)):
+        if Q[k] == R[k]:
+            Tm = signal[R[k]-1]  # correction for zero-based indexing
+        else:
+            Tm = signal[R[k]-1] + (Q[k] - R[k])*(signal[R[k]] - signal[R[k]-1]) # correction for zero-based indexing
+        scaled_signal.append(Tm)    
+    return scaled_signal
     
-    real_scaled = (power_signal * len(power_signal))/output_scale
-    floor_scaled = [math.floor(freq) for freq in real_scaled]
-    scaled_signal = [] # - continue here: need to choose whether Q or R applicable and then 
-    # calculate scaled signal
-    for freq in real_scaled:
-        scaled_signal.append 
