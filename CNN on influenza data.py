@@ -1,6 +1,12 @@
 import tensorflow as tf
 from tensorflow import keras
 import pickle
+from keras import models
+from keras.models import Sequential
+from keras.layers import Conv1D
+from keras.layers import MaxPooling1D
+from keras.layers import Dense
+from keras.layers import Dropout
 
 labelled = pickle.load(open(r'C:\Users\chapmanvl\Documents\VC 2019 projects\Influenza A segment 6 NA\even_scaled_signals_labelled.txt', 'rb'))
 
