@@ -7,6 +7,8 @@ from IPython.display import Markdown
 import os
 from os import listdir
 from os.path import isfile, join
+os.chdir(r'C:\Users\chapmanvl\Documents\VC 2019 projects')
+print(os.getcwd())
 
 # Extract sequence from file
 def getseqsample(file):
@@ -81,13 +83,16 @@ def getcomplex(X, Y):         # skipping the first values (initiated at (0.5,0.5
 
 # retrieve the power signal from the Z coordinates
 def powersignal(cgr_z):
-    #array = np.array(input[0])
-    dftZ = np.fft.fft(cgr_z)
+    input_signal = np.array(cgr_z).real
+    #print ('sum_input-signal: ', np.mean(input_signal))
+    dftZ = np.fft.fft(input_signal)
+    print(dftZ[0])
     PSZ = np.abs(dftZ)**2
     mean_signal = PSZ[0]
     signal = PSZ[1:] #skipping first signal 
     #freq = np.fft.fftfreq((psd.shape[0]) )
     return mean_signal, signal
+    
 
 # Test case: mean_signal, signal = powersignal(Z)
 
@@ -130,6 +135,19 @@ def one_cold_chaos_coord_plebs(oligomer):
          Z.append(complex(x,y))
     return X, Y, Z
 
+def even_scale(signal, output_scale):
+    scaled_signal = [signal[0]] # first term for tm and tn the same
+    initialise = range(2,output_scale + 1)
+    Q = [k*(len(signal)/output_scale) for k in initialise] 
+    R = [math.floor(k) for k in Q]
+    for k in range(len(Q)):
+        if Q[k] == R[k]:
+            Tm = signal[R[k]-1]  # correction for zero-based indexing
+        else:
+            Tm = signal[R[k]-1] + (Q[k] - R[k])*(signal[R[k]] - signal[R[k]-1]) # correction for zero-based indexing
+        scaled_signal.append(Tm)    
+    return scaled_signal
+
 def seq_to_chaosfile_plebs(seq, name):
     # clean seq first
     sequence = seq.strip().upper()        
@@ -150,12 +168,30 @@ def seq_to_chaosfile_plebs(seq, name):
 
 Buba = getseqsample('Buba_buba_GU571285.fasta')
 X, Y, Z = one_cold_chaos_coord_plebs(Buba)
+
 mean_signal, signal = powersignal(Z)
 X_axis = range(len(signal))
 plt.plot(X_axis, signal)
-plt.xlim(0,350)      # looks very similar to Hoang, Yin and Yau 2016 in Genomics
+#plt.xlim(0,350)      # looks very similar to Hoang, Yin and Yau 2016 in Genomics
 #plt.ylim(0,8000)
 plt.show()
+
+
+### Scaled to 1000
+Buba = getseqsample('Buba_buba_GU571285.fasta')
+X, Y, Z = one_cold_chaos_coord(Buba)
+#real_Z = np.array(Z).real
+#subtracted_Z = real_Z - np.mean(real_Z)
+print(np.sum(subtracted_Z))
+mean_signal, signal = powersignal(subtracted_Z)
+print(mean_signal)
+scaled_to_1000 = even_scale(signal, 1000)
+X_axis = range(len(scaled_to_1000))
+plt.plot(X_axis, scaled_to_1000)
+#plt.xlim(0,350)      # looks very similar to Hoang, Yin and Yau 2016 in Genomics
+#plt.ylim(0,8000)
+plt.show()
+
 
 scaled_psd, scaled_freq = scaledpowersignal(Z, 1000)
 plt.plot(scaled_freq, scaled_psd)
@@ -163,3 +199,4 @@ plt.xlim(0,0.4)
 #plt.ylim(0,8000)
 plt.show()
 """
+

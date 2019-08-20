@@ -95,7 +95,6 @@ def seq_to_chaos(seq):
 # Cutting up sequences
 # 1) Load file as string and clean 
 def getseqsample(file):
-    c
     with open (file) as seq:
         for line in seq:
             if line.startswith('>'):
