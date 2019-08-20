@@ -21,11 +21,12 @@ print(X_CV.shape, y_CV.shape)
 print(X_test.shape, y_test.shape)
 
 #model
-model = tf.keras.models.Sequential([tf.keras.layers.Conv1D(64, 3, activation = 'relu', input_shape = (None, 1467)),
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv1D(64, 3, activation = 'relu', input_shape = (1, 1467)),
     tf.keras.MaxPooling1D(2),
     tf.keras.layers.Conv1D(64, 3, activation = 'relu'),
     tf.keras.MaxPooling1D(2),
-    tf.keras.layers.Dense(36, activation = 'relu'),
+    tf.keras.layers.Dense(72, activation = 'relu'),
     tf.keras.layers.Dropout(0.2),
     tf.keras.layers.Dense(6, activation = 'softmax')
 ])
@@ -35,5 +36,25 @@ model.summary()
 from tensorflow.keras.optimizers import RMSprop
 model.compile(loss = 'categorical_crossentropy', optimizer = RMSprop(lr = 0.001), metrics = ['acc'])
 
+#fit model to training set and implement validation
+history = model.fit(X_train, y_train, epochs = 10, validation_data= (X_CV, y_CV))
 
+#plot training and val accuracy over epochs
+import matplotlib.pyplot as plt
+acc = history.history['acc']
+val_acc = history.history['val_acc']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(len(acc))
+
+plt.plot(epochs, acc, 'r', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.legend(loc=0)
+plt.figure()
+
+plt.show()
+
+#evaluate on test data
 test_loss = model.evaluate(X_test, y_test)
