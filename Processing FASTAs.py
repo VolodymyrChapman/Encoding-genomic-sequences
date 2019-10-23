@@ -44,9 +44,6 @@ def getseqsamples(file, output_name, max_length):
         display (Markdown(f'<span style="color: #ff0000">Error: Max length of unambiguous code too short:</span>{len(pure_chunk)}.'))
 
 
-# test sample: getseqsamples("C:\\Users\\chapmanvl\\Documents\\VC 2019 projects\\HRV_input\\HRV_A.fasta", "test1", 5000)
-
-
 # cut sequence into user-defined number of lengths of fixed length - needs clean sequence sto be input (have to run sequences through getseqsample first)
 def cutandsample_fixed(file, output_folder_name, desired_length, number):
     # making a new directory, opening the file,determining sequence length and checking that sequence length is longer than desired length
@@ -66,9 +63,6 @@ def cutandsample_fixed(file, output_folder_name, desired_length, number):
                 endsite = startsite + desired_length
                 output_file.write(seq[startsite:endsite] + '\n')
 
-# test sample: cutandsample_fixed("C:\\Users\\chapmanvl\\Documents\\VC 2019 projects\\test1.txt", "testing_cut", 500, 10)
-
-
 # cut sequence into user-defined number of lengths of random length - needs clean sequence sto be input (have to run sequences through getseqsample first)
 def cutandsample_random(file, output_folder_name, number):
     # making a new directory, opening the file,determining sequence length and checking that sequence length is longer than desired length
@@ -86,95 +80,3 @@ def cutandsample_random(file, output_folder_name, number):
                 output_file.write(seq[startsite:endsite] + '\n')
                 lengths.append(len(seq[startsite:endsite]))
     return lengths  
-# test sample: cutandsample_random("C:\\Users\\chapmanvl\\Documents\\VC 2019 projects\\test1.txt", "testing_cut_random", 10)
-
-# Sequence to chaos game representation co-ordinates
-def one_cold_chaos_coord(oligomer):
-    ruleX = {'A': 0, 'C' : 0, 'G': 1, 'T' : 1}
-    ruleY = {'A': 0, 'C' : 1, 'G': 1, 'T' : 0}
-    X_complex = [ruleX[i] for i in oligomer ] 
-    X_complex.insert(0,0.5)
-    Y_complex = [ruleY[i] for i in oligomer ] 
-    Y_complex.insert(0,0.5)
-    
-    for i in range(len(X_complex[1:])):
-        h = i + 1
-        X_complex[h] = (X_complex[i] + X_complex[h])/2
-    for i in range(len(Y_complex[1:])):
-        h = i + 1
-        Y_complex[h] = (Y_complex[i] + Y_complex[h])/2
-        
-    coordinates = [X_complex, Y_complex]
-    return coordinates
-
-""" Test case of chaos game co-ordinates 
-journal_sequence = one_cold_chaos_coord("GAATTC")
-X = journal_sequence[0]
-Y = journal_sequence[1]
-
-lines, points = plt.subplots()
-points.plot(X, Y, 'ro-')
-points.set(xlim = (0, 1), ylim = (0,1))
-for i, txt in enumerate(X):
-    plt.annotate(txt, (X[i], Y[i])) """ 
-
-# Sequence to chaos game representation diagram
-def seq_to_chaos(seq):
-    # clean seq first
-    sequence = seq.strip().upper()        
-    # warn the user if an obnoxoious character found in the file
-    for uniq_char in  set(sequence):
-        if uniq_char not in 'ATCGN':  
-            print( f"a bad character found: {uniq_char}")
-    pure_sequence = ''.join([ s for s in sequence if s in 'ATGC'])  
-    chaos = one_cold_chaos_coord(pure_sequence)
-    X = chaos[0]
-    Y = chaos[1]
-
-    plt.plot(X, Y, '.', markersize=1)
-    plt.show()
-    
-# test case: seq_to_chaos('GAATTC')
-
-# For exporting to a file
-def seq_to_chaosfile(seq, name):
-    # clean seq first
-    sequence = seq.strip().upper()        
-    # warn the user if an obnoxoious character found in the file
-    for uniq_char in  set(sequence):
-        if uniq_char not in 'ATCGN':  
-            print( f"a bad character found: {uniq_char}")
-    pure_sequence = ''.join([ s for s in sequence if s in 'ATGC'])  
-    chaos = one_cold_chaos_coord(pure_sequence)
-    X = chaos[0]
-    Y = chaos[1]
-
-    plt.plot(X, Y, 'k.', markersize=1)
-    plt.axis('off')
-    plt.xlim(0,1)
-    plt.ylim(0,1)
-    plt.savefig(f'{name}.png', bboxinches = 0, set_facecolor = 'white')
-
-# Test case:    seq_to_chaosfile('ATTTGCATGAGGGGAGAT', 'testing')
-
-
-# For exporting to file and also giving Z (list of X and Y)
-def seq_to_chaosfile(seq, name):
-    # clean seq first
-    sequence = seq.strip().upper()        
-    # warn the user if an obnoxoious character found in the file
-    for uniq_char in  set(sequence):
-        if uniq_char not in 'ATCGN':  
-            print( f"a bad character found: {uniq_char}")
-    pure_sequence = ''.join([ s for s in sequence if s in 'ATGC'])  
-    chaos = one_cold_chaos_coord(pure_sequence)
-    X = chaos[0]
-    Y = chaos[1]
-
-    plt.plot(X, Y, 'k.', markersize=1)
-    plt.axis('off')
-    plt.xlim(0,1)
-    plt.ylim(0,1)
-    new_name = os.path.splitext(name)[0] # to remove current file extension
-    plt.savefig(f'{new_name}.png', bboxinches = 0, set_facecolor = 'white')
-    return X, Y 
