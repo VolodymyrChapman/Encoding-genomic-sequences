@@ -1,9 +1,5 @@
 # Code for cutting a portion of a sequence; if FASTA format, will, erase first line 
-import numpy as np
-import pandas as pd
 import random as rand
-import math
-import matplotlib.pyplot as plt
 from IPython.display import Markdown
 import os
 
@@ -39,7 +35,6 @@ def getseqsamples(file, output_name, max_length):
                 No_of_fastas += 1  
                 if No_of_fastas > 1:
                      print("first sequence shorter than maximum length")
-                        return
         # Displays a red error message if pure_chunk shorter than required length
         display (Markdown(f'<span style="color: #ff0000">Error: Max length of unambiguous code too short:</span>{len(pure_chunk)}.'))
 
@@ -63,7 +58,7 @@ def cutandsample_fixed(file, output_folder_name, desired_length, number):
                 endsite = startsite + desired_length
                 output_file.write(seq[startsite:endsite] + '\n')
 
-# cut sequence into user-defined number of lengths of random length - needs clean sequence sto be input (have to run sequences through getseqsample first)
+# cut sequence into user-defined number of lengths of random length - needs clean sequences to be input (have to run sequences through getseqsample first)
 def cutandsample_random(file, output_folder_name, number):
     # making a new directory, opening the file,determining sequence length and checking that sequence length is longer than desired length
     os.mkdir(f"{output_folder_name}")
