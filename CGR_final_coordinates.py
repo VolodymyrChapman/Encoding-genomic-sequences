@@ -5,7 +5,7 @@ def ChaosGameFinal(raw_sequence):
 # Ensure all bases uppercase
     upper_sequence = raw_sequence.upper()
 
-#Filter for invlaid characters
+#Filter for invalid characters
     sequence = "".join([base for base in upper_sequence if base in "ATGC"])
 
 # Initiate lists of coordinates for relevant corners for each letter

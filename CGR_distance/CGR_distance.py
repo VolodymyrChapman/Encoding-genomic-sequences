@@ -1,8 +1,8 @@
 
-# Function to obtain cartesian coordinates for chaos 
-# game representation of genetic sequences
+# Function to obtain X and Y distances between coordinates on CGRs 
+# in order to more clearly identify repeating patterns
 
-def ChaosGame(raw_sequence):
+def ChaosDistance(raw_sequence):
  
 # Ensure all bases uppercase
     upper_sequence = raw_sequence.upper()
@@ -25,6 +25,7 @@ def ChaosGame(raw_sequence):
         Ly.append(dictionaryY[letter])
 
 # Initiate final X and Y coordinate lists with starting point (0.5, 0.5):
+    
     X = [0.5]
     Y = [0.5]
 
@@ -37,9 +38,21 @@ def ChaosGame(raw_sequence):
         X.append(X_value)
         Y.append(Y_value)
     
-    return X, Y
+# Calculate X and Y distance between adjacent points
+    distance_X = []    # initiate distance lists
+    distance_Y = []
+    
+    # calculate the X and Y distance between adjacent points and
+    # append to distance_X/distance_Y lists, skipping the first point (0.5, 0.5) 
+    for i in range(1, len(X)-1):
+        dist_X = X[i+1] - X[i]
+        dist_Y = Y[i+1] - Y[i]
+        distance_X.append(dist_X)
+        distance_Y.append(dist_Y)
 
+    
+    return distance_X, distance_Y
 
 # Test case:
 code = "ATTGACGT"
-X, Y = ChaosGame(code)
+X_dist, Y_dist = ChaosDistance(code)
